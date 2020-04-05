@@ -73,13 +73,23 @@ const App = () => {
   const [snackBar, setSnackBar] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const [deviceName, setDeviceName] = React.useState("");
+  const [loader, setLoader] = React.useState(false);
 
   useEffect(() => {
+    setLoader(true);
     axios.get(`http://localhost:5000/listAllDevices`).then((res) => {
+      setLoader(false);
       setListDevices(res.data);
-      console.log(res.data);
     });
   }, []);
+
+  const reloadData = () => {
+    setLoader(true);
+    axios.get(`http://localhost:5000/listAllDevices`).then((res) => {
+      setLoader(false);
+      setListDevices(res.data);
+    });
+  }
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -88,40 +98,41 @@ const App = () => {
   const handleClose = () => {
     setSnackBar(true);
     setOpen(false);
+    setLoader(true);
     axios
       .post(`http://localhost:5000/addDevice`, {
         deviceName: deviceName,
       })
       .then((res) => {
-        console.log(res.data);
+        reloadData();
+        setTimeout(() => {
+          setSnackBar(false);
+        }, 3000);
       });
-    setTimeout(() => {
-      window.location.reload();
-    }, 4000);
   };
 
   const deleteDevice = (deviceId: string) => {
+    setLoader(true);
     axios
       .post(`http://localhost:5000/deleteDevice`, {
         deviceID: deviceId,
       })
       .then((res) => {
-        console.log(res.data);
+        reloadData();
       });
-    window.location.reload();
   };
 
   const switchOff = (smart_device_iD: string, smart_device_status: boolean) => {
     console.log(!Boolean(smart_device_status));
+    setLoader(true);
     axios
       .post(`http://localhost:5000/changeSmartDeviceStatus`, {
         smartDeviceSelected: !Boolean(smart_device_status),
         deviceID: smart_device_iD,
       })
       .then((res) => {
-        console.log(res.data);
+        reloadData();
       });
-    window.location.reload();
   };
 
   const handleDialogClose = () => {
@@ -147,6 +158,12 @@ const App = () => {
             </span>
           </div>
           <Divider className={classes.customDivider} />
+
+          {loader && (
+              <div className="loading-state__block">
+                <CircularProgress />
+              </div>
+            ) || 
           <div className="contentContainer">
             <Grid container={true} spacing={2}>
               {listDevices.map((getDevice: Device) => (
@@ -209,11 +226,7 @@ const App = () => {
                 </Grid>
               ))}
             </Grid>
-            {listDevices.length <= 0 && (
-              <div className="loading-state__block">
-                <CircularProgress />
-              </div>
-            )}
+          
             <div>
               <Dialog
                 open={open}
@@ -260,6 +273,7 @@ const App = () => {
               message={`Device name: [${deviceName}] has been added`}
             />
           </div>
+        }
         </Container>
       </Container>
     </Fragment>
