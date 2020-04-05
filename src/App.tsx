@@ -22,8 +22,9 @@ import Snackbar from "@material-ui/core/Snackbar";
 import axios from "axios";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
+
 interface Device {
-  smart_device_iD: string;
+  smart_device_id: string;
   smart_device_name: string;
   smart_device_status: boolean;
 }
@@ -101,7 +102,7 @@ const App = () => {
     setLoader(true);
     axios
       .post(`http://localhost:5000/addDevice`, {
-        deviceName: deviceName,
+        smart_device_name: deviceName,
       })
       .then((res) => {
         reloadData();
@@ -115,7 +116,7 @@ const App = () => {
     setLoader(true);
     axios
       .post(`http://localhost:5000/deleteDevice`, {
-        deviceID: deviceId,
+        smart_device_id: deviceId,
       })
       .then((res) => {
         reloadData();
@@ -127,8 +128,8 @@ const App = () => {
     setLoader(true);
     axios
       .post(`http://localhost:5000/changeSmartDeviceStatus`, {
-        smartDeviceSelected: !Boolean(smart_device_status),
-        deviceID: smart_device_iD,
+        smart_device_status: !Boolean(smart_device_status),
+        smart_device_id: smart_device_iD,
       })
       .then((res) => {
         reloadData();
@@ -154,16 +155,16 @@ const App = () => {
                 className={classes.addDevice}
                 onClick={handleClickOpen}
               />
-              {/* <span>Add Device</span> */}
             </span>
           </div>
           <Divider className={classes.customDivider} />
-
           {loader && (
               <div className="loading-state__block">
                 <CircularProgress />
               </div>
-            ) || 
+            ) 
+            // eslint-disable-next-line
+            || 
           <div className="contentContainer">
             <Grid container={true} spacing={2}>
               {listDevices.map((getDevice: Device) => (
@@ -192,7 +193,7 @@ const App = () => {
                             className={classes.onButton}
                             onClick={() =>
                               switchOff(
-                                getDevice.smart_device_iD,
+                                getDevice.smart_device_id,
                                 getDevice.smart_device_status
                               )
                             }
@@ -206,7 +207,7 @@ const App = () => {
                             className={classes.ofButton}
                             onClick={() =>
                               switchOff(
-                                getDevice.smart_device_iD,
+                                getDevice.smart_device_id,
                                 getDevice.smart_device_status
                               )
                             }
@@ -219,7 +220,7 @@ const App = () => {
                         color="primary"
                         className={classes.deleteButton}
                         fontSize="large"
-                        onClick={() => deleteDevice(getDevice.smart_device_iD)}
+                        onClick={() => deleteDevice(getDevice.smart_device_id)}
                       />
                     </CardContent>
                   </Card>
